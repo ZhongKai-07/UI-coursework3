@@ -16,17 +16,3 @@ void TheButton::clicked() {
     emit jumpTo(info);
 }
 
-/*the search button*/
-void TheButton::search(QString index){
-    QString path = info->url->toString(); //get the file path
-    QFileInfo file(path);
-    QString name = file.baseName();
-
-    if(index == ""){
-        setVisible(true);
-    }else if(index != name){
-        setHidden(true);
-    }else{
-        setVisible(true);
-    }
-}

@@ -24,6 +24,7 @@ private:
 
 public:
     ThePlayer() : QMediaPlayer(NULL) {
+
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
 
@@ -35,6 +36,7 @@ public:
 
     // all buttons have been setup, store pointers here
     void setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo>* i);
+    void setPlay(bool flipPlay);
 
 private slots:
 
@@ -47,6 +49,15 @@ public slots:
 
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
+    void skipBack(bool skip);
+    void skipForward(bool skip);
+    void stop();
+    //slots used for our skip buttons
+    void click(bool playValue); //slot for the play/pause button
+    void SetPosition(int position); //slot used for our video slider
+
+private:
+    bool playValue = false;
 };
 
 #endif //CW2_THE_PLAYER_H

@@ -32,3 +32,37 @@ void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
     play();
 }
+
+void ThePlayer::setPlay(bool flipPlay) {
+    playValue = !flipPlay;
+}
+
+void ThePlayer::click(bool click) {
+    if(playValue) {
+        play();
+    } else {
+        pause();
+    }
+    setPlay(playValue);
+}
+
+void ThePlayer::SetPosition(int pos) {
+    setPosition(pos);
+}
+
+void ThePlayer::skipBack(bool skip) {
+    if(!skip) {
+        setPosition(position()-5000);
+    }
+}
+//skip by 5 seconds, hence the +-5000
+void ThePlayer::skipForward(bool skip) {
+    if(!skip) {
+        setPosition(position()+5000);
+    }
+}
+
+void ThePlayer::stop() {
+    setPosition(0);
+    pause();
+}

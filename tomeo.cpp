@@ -29,6 +29,8 @@
 #include "the_videolength.h"
 #include "the_videoslider.h"
 #include "the_volume.h"
+#include "the_playbutton.h"
+#include "the_skipbutton.h"
 
 
 // read in videos and thumbnails to this directory
@@ -108,6 +110,16 @@ int main(int argc, char *argv[]) {
     // the widget that will show the video
     VideoScreen *videoWidget = new VideoScreen();
 
+    QWidget *BigWindow = new QWidget();
+    QWidget *VideoWindow = new QWidget();
+    QWidget *ControlWindow = new QWidget();
+    QWidget *VideoSliderWindow = new QWidget();
+
+    QVBoxLayout *BigLayout = new QVBoxLayout();
+    QHBoxLayout *VideoLayout = new QHBoxLayout();
+    QHBoxLayout *ControlLayout = new QHBoxLayout();
+    QHBoxLayout *VideoSliderLayout = new QHBoxLayout();
+
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer;
     player->setVideoOutput(videoWidget);
@@ -117,18 +129,16 @@ int main(int argc, char *argv[]) {
     // a list of the buttons
     std::vector<TheButton*> buttons;
     // the buttons are arranged horizontally
-    QHBoxLayout *layout = new QHBoxLayout();
+    QHBoxLayout *layout = new QHBoxLayout();        //videos button
     buttonWidget->setLayout(layout);
 
-
-    // create the four buttons
-
+    // create the four videos buttons
     for ( int i = 0; i < 4; i++ ) {
-        TheButton *button = new TheButton(buttonWidget);
-        button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
-        buttons.push_back(button);
-        layout->addWidget(button);
-        button->init(&videos.at(i));
+        TheButton *button_v = new TheButton(buttonWidget);
+        button_v->connect(button_v, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
+        buttons.push_back(button_v);
+        layout->addWidget(button_v);
+        button_v->init(&videos.at(i));
     }
 
     //video lenth label
@@ -142,11 +152,22 @@ int main(int argc, char *argv[]) {
 
     //video length slider
     videoSlider *videoslider = new videoSlider(buttonWidget);
-
     player->connect(player, SIGNAL(durationChanged(qint64)), videoslider, SLOT (SetRange(qint64)));
     player->connect(player, SIGNAL(positionChanged(qint64)), videoslider, SLOT (SetValue(qint64)));
     videoslider->connect(videoslider, SIGNAL(valueChanged(int)), player, SLOT (SetPosition(int)));
 
+    //video play/skip button
+    ForwardButton *forwardSkipBtn = new ForwardButton(buttonWidget);
+    BackwardButton *backwardSkipBtn = new BackwardButton(buttonWidget);
+    PlayButton *playBtn = new PlayButton(buttonWidget);
+
+    playBtn->connect(playBtn, SIGNAL(clicked(bool)), player, SLOT (click(bool)));
+    player->connect(player, SIGNAL(stateChanged(QMediaPlayer::State)), playBtn, SLOT (setState(QMediaPlayer::State)));
+    forwardSkipBtn->connect(forwardSkipBtn, SIGNAL(clicked(bool)), player, SLOT(skipBack(bool)));
+    backwardSkipBtn->connect(backwardSkipBtn, SIGNAL(clicked(bool)), player, SLOT(skipForward(bool)));
+
+    StopButton *stopBtn = new StopButton(buttonWidget);
+    stopBtn->connect(stopBtn, SIGNAL(clicked(bool)), player, SLOT (stop()));
 
     //video volume control
     Volume *button = new Volume(buttonWidget);
@@ -158,11 +179,12 @@ int main(int argc, char *argv[]) {
     volumeSlider->connect(volumeSlider, SIGNAL(valueChanged(int)), player, SLOT(setVolume(int)));
     volumeSlider->connect(volumeSlider, SIGNAL(valueChanged(int)), button, SLOT (changeIcon(int)));
 
+    player->connect(player, SIGNAL(positionChanged(qint64)), length, SLOT (setLength(qint64)));
+    player->connect(player, SIGNAL(durationChanged(qint64)), duration, SLOT (setLength(qint64)));
+    //as video changes, length and duration labels will change
+
     //set start as full screen
     videoWidget->setFullScreen(false);
-
-
-
 
     // tell the player what buttons and videos are available
     player->setContent(&buttons, & videos);
@@ -175,12 +197,32 @@ int main(int argc, char *argv[]) {
     window.setMinimumSize(800, 680);
 
     // add the video and the buttons to the top level widget
-    top->addWidget(videoWidget);
-    top->addWidget(buttonWidget);
-    top->addWidget(videoslider);
-    top->addWidget(length);
-    top->addWidget(duration);
 
+
+    VideoLayout->addWidget(videoWidget);
+    VideoWindow->setLayout(VideoLayout);
+    BigLayout->addWidget(VideoWindow);
+    BigLayout->addWidget(VideoSliderWindow);
+    BigLayout->addWidget(ControlWindow);
+
+    VideoSliderLayout->addWidget(videoslider);
+    VideoSliderLayout->addWidget(length);
+    VideoSliderLayout->addWidget(duration);
+    VideoSliderWindow->setLayout(VideoSliderLayout);
+
+    ControlWindow->setLayout(ControlLayout);
+    ControlLayout->addWidget(stopBtn);
+    ControlLayout->addWidget(forwardSkipBtn);
+    ControlLayout->addWidget(playBtn);
+    ControlLayout->addWidget(backwardSkipBtn);
+    ControlLayout->addWidget(button);     //volunme button
+    ControlLayout->addWidget(volumeSlider);   //volume slider
+    ControlLayout->addStretch();  // 添加伸缩
+
+    BigWindow->setLayout(BigLayout);
+
+    top->addWidget(BigWindow);
+    top->addWidget(buttonWidget);
     // showtime!
     window.show();
 

@@ -12,7 +12,7 @@ void videoLength::setLength(qint64 position){
     }else{
         format = "hh:mm:ss"; //if the length is more than 60 min
     }
-    str = currTime.toString(format) + "   /      ";
+    str = currTime.toString(format) + " /  ";
     setText(str);
 
 }

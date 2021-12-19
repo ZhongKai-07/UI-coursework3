@@ -9,6 +9,7 @@ CONFIG += c++11
 
 SOURCES += \
         the_button.cpp \
+        the_playbutton.cpp \
         the_player.cpp \
         the_videolength.cpp \
         the_videoscreen.cpp \
@@ -18,7 +19,9 @@ SOURCES += \
 
 HEADERS += \
     the_button.h \
+    the_playbutton.h \
     the_player.h \
+    the_skipbutton.h \
     the_videolength.h \
     the_videoscreen.h \
     the_videoslider.h \

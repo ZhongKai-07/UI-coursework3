@@ -12,7 +12,7 @@ class Volume : public QPushButton{
 public:
     Volume(QWidget *parent) : QPushButton(parent){
         setIconSize(QSize(40, 40));
-        setFixedSize(40, 40);
+        setFixedSize(60, 60);
         setIcon(style()->standardIcon(QStyle::SP_MediaVolumeMuted));
         connect(this, SIGNAL(released()), this, SLOT(clicked()));
     }
@@ -38,6 +38,7 @@ public:
         setStyle(QStyleFactory::create("Fusion"));
         setTracking(true);
         setRange(0,100);
+        setFixedSize(500,40);
     }
 
 private slots:
